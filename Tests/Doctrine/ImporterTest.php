@@ -50,6 +50,7 @@ class ImporterTest extends \PHPUnit_Framework_TestCase
                 0 => 'Header 1',
                 1 => 'Header 2',
                 2 => 'Header 3',
+                3 => 'Header 4',
             ],
             $this->importer->getHeaders()
         );

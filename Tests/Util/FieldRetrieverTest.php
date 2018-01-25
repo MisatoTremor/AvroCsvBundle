@@ -10,6 +10,7 @@ namespace Avro\CsvBundle\Tests\Util;
 use Avro\CaseBundle\Util\CaseConverter;
 use Avro\CsvBundle\Util\FieldRetriever;
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Annotations\AnnotationRegistry;
 
 class FieldRetrieverTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +25,7 @@ class FieldRetrieverTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        AnnotationRegistry::registerLoader('class_exists');
         $annotationReader = new AnnotationReader();
         $caseConverter = new CaseConverter();
         $this->fieldRetriever = new FieldRetriever($annotationReader, $caseConverter);
@@ -39,6 +41,7 @@ class FieldRetrieverTest extends \PHPUnit_Framework_TestCase
                 '1' => 'Id',
                 '2' => 'Field1',
                 '3' => 'Field2',
+                '4' => 'Assoc1',
             ]
         );
     }
@@ -52,6 +55,7 @@ class FieldRetrieverTest extends \PHPUnit_Framework_TestCase
                 '1' => 'id',
                 '2' => 'field1',
                 '3' => 'field2',
+                '4' => 'assoc1',
             ]
         );
     }
@@ -65,6 +69,7 @@ class FieldRetrieverTest extends \PHPUnit_Framework_TestCase
                 'id' => 'id',
                 'field1' => 'field1',
                 'field2' => 'field2',
+                'assoc1' => 'assoc1',
             ]
         );
     }

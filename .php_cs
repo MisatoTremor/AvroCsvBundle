@@ -4,6 +4,7 @@ return PhpCsFixer\Config::create()
     ->setRules(
         [
             '@Symfony' => true,
+            '@DoctrineAnnotation' => true,
             'array_syntax' => ['syntax' => 'short'],
             'ordered_imports' => true,
         ]

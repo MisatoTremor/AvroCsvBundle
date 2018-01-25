@@ -16,6 +16,8 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Doctrine\ORM\Mapping\MappingException;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * Import csv to doctrine entity/document.
@@ -68,6 +70,10 @@ class Importer
      * @var string
      */
     protected $class;
+    /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
 
     /**
      * @param Reader                   $reader        The csv reader
@@ -83,6 +89,7 @@ class Importer
         $this->caseConverter = $caseConverter;
         $this->objectManager = $objectManager;
         $this->batchSize = $batchSize;
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -214,42 +221,28 @@ class Importer
         foreach ($fields as $k => $v) {
             if ($this->metadata->hasField(lcfirst($v))) {
                 $entity->{'set'.$fields[$k]}($row[$k]);
-            } elseif ($this->metadata->hasAssociation(lcfirst($v))) {
+            } elseif (!empty($row[$k]) && $this->metadata->hasAssociation(lcfirst($v))) {
                 $association = $this->metadata->getAssociationMapping(lcfirst($v));
                 switch ($association['type']) {
-                    case '1': // oneToOne
-                        //Todo:
-                        break;
-                    case '2': // manyToOne
-                        continue;
-                        // still needs work
-                        $joinColumnId = $association['joinColumns'][0]['name'];
-                        $legacyId = $row[array_search($this->caseConverter->toCamelCase($joinColumnId), $this->headers)];
-                        if ($legacyId) {
-                            try {
-                                $criteria = ['legacyId' => $legacyId];
-                                if ($this->useOwner) {
-                                    $criteria['owner'] = $this->owner->getId();
-                                }
-
-                                $associationClass = new \ReflectionClass($association['targetEntity']);
-                                if ($associationClass->hasProperty('legacyId')) {
-                                    $relation = $this->objectManager->getRepository($association['targetEntity'])->findOneBy($criteria);
-                                    if ($relation) {
-                                        $entity->{'set'.ucfirst($association['fieldName'])}($relation);
-                                    }
-                                }
-                            } catch (\Exception $e) {
-                                // legacyId does not exist
-                                // fail silently
+                    case ClassMetadataInfo::ONE_TO_ONE: // oneToOne
+                    case ClassMetadataInfo::MANY_TO_ONE: // manyToOne
+                        $associationClass = new \ReflectionClass($association['targetEntity']);
+                        if ($associationClass->hasProperty('id')) {
+                            $relation = $this->objectManager->getRepository($association['targetEntity'])->findOneBy(['id' => $row[$k]]);
+                            if ($relation) {
+                                $this->propertyAccessor->setValue($entity, lcfirst($v), $relation);
                             }
                         }
                         break;
-                    case '4': // oneToMany
-                        //TODO:
-                        break;
-                    case '8': // manyToMany
-                        //TODO:
+                    case ClassMetadataInfo::ONE_TO_MANY: // oneToMany
+                    case ClassMetadataInfo::MANY_TO_MANY: // manyToMany
+                        $associationClass = new \ReflectionClass($association['targetEntity']);
+                        if ($associationClass->hasProperty('id')) {
+                            $relation = $this->objectManager->getRepository($association['targetEntity'])->findOneBy(['id' => $row[$k]]);
+                            if ($relation) {
+                                $this->propertyAccessor->setValue($entity, lcfirst($v), $relation);
+                            }
+                        }
                         break;
                 }
             }

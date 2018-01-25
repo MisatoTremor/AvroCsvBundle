@@ -29,6 +29,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
                 0 => 'Header 1',
                 1 => 'Header 2',
                 2 => 'Header 3',
+                3 => 'Header 4',
             ],
             $this->reader->getHeaders()
         );
@@ -41,6 +42,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
                 0 => 'row1column1',
                 1 => 'row1column2',
                 2 => 'row1column3',
+                3 => '1',
             ],
             $this->reader->getRow()
         );
@@ -49,6 +51,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
                 0 => 'row2column1',
                 1 => 'row2column2',
                 2 => 'row2column3',
+                3 => '',
             ],
             $this->reader->getRow()
         );
@@ -57,6 +60,7 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
                 0 => 'row3column1',
                 1 => 'row3column2',
                 2 => 'row3column3',
+                3 => '',
             ],
             $this->reader->getRow()
         );
@@ -70,11 +74,13 @@ class ReaderTest extends \PHPUnit_Framework_TestCase
                     0 => 'row1column1',
                     1 => 'row1column2',
                     2 => 'row1column3',
+                    3 => '1',
                 ],
                 1 => [
                     0 => 'row2column1',
                     1 => 'row2column2',
                     2 => 'row2column3',
+                    3 => '',
                 ],
             ],
             $this->reader->getRows(2)

@@ -44,6 +44,7 @@ class FieldRetriever
     public function getFields($class, $format = 'title', $copyToKey = false)
     {
         $reflectionClass = new \ReflectionClass($class);
+        $this->annotationReader->getClassAnnotations($reflectionClass);
         $properties = $reflectionClass->getProperties();
 
         $fields = [];

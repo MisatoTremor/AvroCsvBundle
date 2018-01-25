@@ -19,7 +19,8 @@
     },
     "require": {
         "php": "^5.5.9|>=7.0.8",
-        "avro/case-bundle": "*"
+        "avro/case-bundle": "*",
+        "symfony/property-access": "~2.8|~3.0|~4.0"
     },
     "require-dev": {
         "twig/twig": "*",
